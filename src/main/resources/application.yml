@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: hsd-jenkins-ci
+  profiles:
+    active: dev
+  jackson: 
+    property-naming-strategy: LOWER_CAMEL_CASE 
+
+server:
+  port: 8040
+
+management:
+  security:
+    enabled: false
+
+info:
+  name: "@project.name@"
+  description: "@project.description@" 
+  version: "@project.version@"
+  spring-boot-version: "@project.parent.version@"  
+
+eureka:
+    instance:
+        statusPageUrlPath: /info
+        healthCheckUrlPath: /health
+    client:
+        serviceUrl:
+            defaultZone: http://localhost:9080/eureka/
+            
+swagger:
+    basepackage: com.hsd.jenkins.web
+    service:
+        name: Jenkins-CI
+        description: Jenkins-CI
+        developer: Uname.CHEN
+
+logging:
+  level.root: info
+  path: logs/
+  file: hsd-jenkins-ci.log 
+
+jenkinsci:
+  swagger-open: true #是否开启swagger (true/false)
+  
