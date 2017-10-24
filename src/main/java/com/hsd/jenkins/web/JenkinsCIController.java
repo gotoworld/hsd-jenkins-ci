@@ -81,7 +81,7 @@ public class JenkinsCIController {
         
         String outgoingUrl = "http://192.168.254.240:88/job/gold-common-jobs" + toQueryString(parameters);
         if (StringUtils.equals(username, map.get(group)) && tagName.startsWith("V0")) {
-            executorService.submit(new TaskOfOutgoingPost("", outgoingUrl, "admin", "177245j"));
+            executorService.submit(new TaskOfOutgoingPost("", outgoingUrl, "jenkins", "jenkins"));
         }
         
         return null;

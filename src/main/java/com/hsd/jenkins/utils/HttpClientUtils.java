@@ -11,11 +11,15 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -44,23 +48,26 @@ public class HttpClientUtils {
      * @param username
      * @param password
      */
-    public static void postWithBasicAuth(String textMsg, String outgoingUrl, String username, String password) {  
+    public static void postWithBasicAuth(String textMsg, String outgoingUrl, String username, String password) { 
         
-        HttpHost httpHost = HttpHost.create(outgoingUrl);
+        //Create HttpHost from a url
+        HttpHost httpHost = create(outgoingUrl);
         
         // 凭据提供器
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
-        credsProvider.setCredentials(
-                // 认证范围
-                new AuthScope(httpHost),
-                // 认证用户名和密码
-                new UsernamePasswordCredentials(username, password));
+        credsProvider.setCredentials(AuthScope.ANY, 
+          new UsernamePasswordCredentials(username, password));
+         
+        AuthCache authCache = new BasicAuthCache();
+        authCache.put(httpHost, new BasicScheme());
+         
+        // Add AuthCache to the execution context
+        final HttpClientContext context = HttpClientContext.create();
+        context.setCredentialsProvider(credsProvider);
+        context.setAuthCache(authCache);
         
         // 创建默认的httpClient实例.    
-        CloseableHttpClient httpclient = HttpClients.custom()
-                .setDefaultCredentialsProvider(credsProvider)
-                .build();
-        
+        CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
         
         // 创建httppost    
         HttpPost httppost = new HttpPost(outgoingUrl); 
@@ -71,7 +78,7 @@ public class HttpClientUtils {
         try {  
             httppost.setEntity(se);  
             logger.info("executing post request --> {}", httppost.getURI());  
-            CloseableHttpResponse response = httpclient.execute(httppost);  
+            CloseableHttpResponse response = httpclient.execute(httppost,context);  
             try {  
                 HttpEntity entity = response.getEntity();  
                 if (entity != null) {  

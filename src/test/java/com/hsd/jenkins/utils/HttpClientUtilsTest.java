@@ -16,16 +16,23 @@ import org.junit.Test;
  */
 public class HttpClientUtilsTest {
     
+    static final String outgoingUrl = "http://192.168.254.240:88/job/gold-common-jobs/buildWithParameters?application=hsdgold-console-pc&tag=V0.10.23.9&group=gold";
     
     @Test
     public void testCreateHttpHostByURL() {
       
-        String outgoingUrl = "http://192.168.254.240:88/job/gold-common-jobs/buildWithParameters?application=hsdgold-console-pc&tag=V0.10.23.9&group=gold";
         HttpHost httpHost = HttpClientUtils.create(outgoingUrl);
         
         assertEquals("http://192.168.254.240:88", httpHost.toURI());
     }
     
+    
+    @Test
+    public void testPostWithBasicAuth(){
+        
+        HttpClientUtils.postWithBasicAuth("", outgoingUrl, "jenkins", "jenkins");
+        
+    }
     
  
 }

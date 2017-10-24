@@ -18,6 +18,8 @@ public class TaskOfOutgoingPost implements Callable<String> {
     public TaskOfOutgoingPost(String textMsg,String outgoingUrl,String username,String password){   
         this.textMsg = textMsg;   
         this.outgoingUrl = outgoingUrl;   
+        this.username = username;   
+        this.password = password;   
     }
     
     /**
