@@ -4,8 +4,11 @@
  */
 package com.hsd.jenkins.web;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -13,6 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,15 +49,15 @@ public class JenkinsCIController {
     }
     
     @ApiOperation(value = "Handle the CI trigger event", notes = "CI trigger")
-    @ApiImplicitParam(name = "message", value = "CI trigger message", required = true, dataType = "String")
+    @ApiImplicitParam(name = "textMsg", value = "CI trigger message", required = true, dataType = "String")
     @PostMapping("/trigger")
-    public ResVo<BaseVO> trigger(String message) {
-        logger.info("received CI trigger message: {}", message);
-        if (!message.contains("tag_push")) {
-            logger.error("message doesn't match a tag push event: {}", message);
+    public ResVo<BaseVO> trigger(@RequestBody String textMsg) {
+        logger.info("received CI trigger message: {}", textMsg);
+        if (!textMsg.contains("tag_push")) {
+            logger.error("message doesn't match a tag push event: {}", textMsg);
         }
         
-        TagPushEvent event = JSON.parseObject(message, TagPushEvent.class);
+        TagPushEvent event = JSON.parseObject(textMsg, TagPushEvent.class);
         
         ExecutorService executorService = Executors.newCachedThreadPool();
         
@@ -70,10 +74,50 @@ public class JenkinsCIController {
             tagName = s[2];
         }
         
-        if (StringUtils.equals(username, map.get(group)) && tagName.startsWith("V.")) {
-            executorService.submit(new TaskOfOutgoingPost("", "", "admin", "admin"));
+        Map<String, Object> parameters = new HashMap<String,Object>();
+        parameters.put("tag", tagName);
+        parameters.put("group", group);
+        parameters.put("application", project.getName());
+        
+        String outgoingUrl = "http://192.168.254.240:88/job/gold-common-jobs" + toQueryString(parameters);
+        if (StringUtils.equals(username, map.get(group)) && tagName.startsWith("V0")) {
+            executorService.submit(new TaskOfOutgoingPost("", outgoingUrl, "admin", "177245j"));
         }
         
         return null;
     }
+    
+    /**
+     * 
+     * Method Description
+     * @version Oct 23, 20175:26:10 PM
+     * @author Ford.CHEN
+     * @param parameters
+     * @return
+     */
+    private String toQueryString(Map<String, Object> parameters) {
+        StringBuilder queryParams = new StringBuilder();
+        
+        for (Entry<String, Object> entry : parameters.entrySet()) {
+           queryParams.append("&").append(entry.getKey()).append("=").append(encode(entry.getValue()));
+        }
+        queryParams.deleteCharAt(0);
+        return "/buildWithParameters?"+queryParams.toString();
+     }
+    
+    /**
+     * 
+     * Method Description
+     * @version Oct 23, 20175:26:07 PM
+     * @author Ford.CHEN
+     * @param value
+     * @return
+     */
+    private String encode(Object value) {
+        try {
+           return URLEncoder.encode(String.valueOf(value), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+           throw new IllegalStateException(e);
+        }
+     }
 }
