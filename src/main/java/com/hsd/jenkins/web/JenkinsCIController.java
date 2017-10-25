@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 
 import javax.annotation.Resource;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,6 +46,8 @@ public class JenkinsCIController {
     
     private final static Logger logger = LoggerFactory.getLogger(JenkinsCIController.class);
     
+    private static final String ONLINE_IMAGES_REPOSITORY_SUFFIX = "release";
+    
     @Resource
     JenkinsProperties jenkinsProperties;
     
@@ -74,19 +77,53 @@ public class JenkinsCIController {
             tagName = s[2];
         }
         
-        Map<String, Object> parameters = new HashMap<String,Object>();
-        parameters.put("tag", tagName);
-        parameters.put("group", group);
-        parameters.put("application", project.getName());
         
         List<String> authors = jenkinsProperties.getAuthors();
+        
+        Map<String, Object> parameters = prepareJenkinsBuildParam(project, group, username, tagName, authors);
+        
         String outgoingUrl = jenkinsProperties.getCommonJobUrl() + toQueryString(parameters);
         
-        if (authors.contains(username) && tagName.startsWith(jenkinsProperties.getReleaseTagPrefix())) {
+       /* Once we judge username and tagname and only build the release tag, now we param this, let the jenkins to make a decision  
+        * Refer to: R001 
+       *  if ( authors.contains(username) && tagName.startsWith(jenkinsProperties.getReleaseTagPrefix())) {
             executorService.submit(new TaskOfOutgoingPost("", outgoingUrl, jenkinsProperties.getUsername(), jenkinsProperties.getPassword()));
-        }
+        }*/
+        logger.info("[{}] push a new project tag [{}:{}] and trigger jenkins build at time {}",username,project.getName(),tagName,DateTime.now());
+        executorService.submit(new TaskOfOutgoingPost("", outgoingUrl, jenkinsProperties.getUsername(), jenkinsProperties.getPassword()));
         
         return null;
+    }
+
+
+    /**
+     * Method Description
+     * @version Oct 25, 201710:04:57 AM
+     * @author Ford.CHEN
+     * @param project
+     * @param group
+     * @param username
+     * @param tagName
+     * @param authors
+     * @return
+     */
+    private Map<String, Object> prepareJenkinsBuildParam(Project project, String group, String username, String tagName, List<String> authors) {
+        String imagerepo = group;
+        boolean isrelease = false;
+        if(authors.contains(username) && tagName.startsWith(jenkinsProperties.getReleaseTagPrefix())){// ROO1
+            logger.info("new release image [{}:{}] is pushed by [{}] at time {}",project.getName(),tagName,username,DateTime.now());
+            
+            imagerepo = imagerepo + ONLINE_IMAGES_REPOSITORY_SUFFIX;
+            isrelease = true;
+        }
+        
+        Map<String, Object> parameters = new HashMap<String,Object>();
+        parameters.put("TAG", tagName);
+        parameters.put("GROUP", group);
+        parameters.put("APPLICATION", project.getName());
+        parameters.put("IMAGEREPO", group); //bath on different repository, publish to different harbor group repository.
+        parameters.put("ISRELEASE", isrelease);
+        return parameters;
     }
     
     
