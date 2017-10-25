@@ -7,12 +7,14 @@ package com.hsd.jenkins.web;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.commons.lang.StringUtils;
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSON;
 import com.hsd.jenkins.bean.Project;
 import com.hsd.jenkins.bean.TagPushEvent;
+import com.hsd.jenkins.config.JenkinsProperties;
 import com.hsd.jenkins.dto.BaseVO;
 import com.hsd.jenkins.dto.ResVo;
 import com.hsd.jenkins.utils.TaskOfOutgoingPost;
@@ -42,11 +45,8 @@ public class JenkinsCIController {
     
     private final static Logger logger = LoggerFactory.getLogger(JenkinsCIController.class);
     
-    
-    static Map<String, String> map = new HashMap<String,String>(); 
-    static {
-        map.put("gold", "chenfangri");
-    }
+    @Resource
+    JenkinsProperties jenkinsProperties;
     
     @ApiOperation(value = "Handle the CI trigger event", notes = "CI trigger")
     @ApiImplicitParam(name = "textMsg", value = "CI trigger message", required = true, dataType = "String")
@@ -79,13 +79,16 @@ public class JenkinsCIController {
         parameters.put("group", group);
         parameters.put("application", project.getName());
         
-        String outgoingUrl = "http://192.168.254.240:88/job/gold-common-jobs" + toQueryString(parameters);
-        if (StringUtils.equals(username, map.get(group)) && tagName.startsWith("V0")) {
-            executorService.submit(new TaskOfOutgoingPost("", outgoingUrl, "jenkins", "jenkins"));
+        List<String> authors = jenkinsProperties.getAuthors();
+        String outgoingUrl = jenkinsProperties.getCommonJobUrl() + toQueryString(parameters);
+        
+        if (authors.contains(username) && tagName.startsWith(jenkinsProperties.getReleaseTagPrefix())) {
+            executorService.submit(new TaskOfOutgoingPost("", outgoingUrl, jenkinsProperties.getUsername(), jenkinsProperties.getPassword()));
         }
         
         return null;
     }
+    
     
     /**
      * 
