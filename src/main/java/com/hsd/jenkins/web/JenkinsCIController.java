@@ -33,6 +33,7 @@ import com.hsd.jenkins.utils.TaskOfOutgoingPost;
 
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Class Description
@@ -42,9 +43,10 @@ import io.swagger.annotations.ApiOperation;
  */
 @RestController
 @RequestMapping("/jenkins")
+@Slf4j
 public class JenkinsCIController {
     
-    private final static Logger logger = LoggerFactory.getLogger(JenkinsCIController.class);
+    private final static Logger log = LoggerFactory.getLogger(JenkinsCIController.class);
     
     private static final String ONLINE_IMAGES_REPOSITORY_SUFFIX = "release";
     
@@ -55,9 +57,9 @@ public class JenkinsCIController {
     @ApiImplicitParam(name = "textMsg", value = "CI trigger message", required = true, dataType = "String")
     @PostMapping("/trigger")
     public ResVo<BaseVO> trigger(@RequestBody String textMsg) {
-        logger.info("received CI trigger message: {}", textMsg);
+        log.info("received CI trigger message: {}", textMsg);
         if (!textMsg.contains("tag_push")) {
-            logger.error("message doesn't match a tag push event: {}", textMsg);
+            log.error("message doesn't match a tag push event: {}", textMsg);
         }
         
         TagPushEvent event = JSON.parseObject(textMsg, TagPushEvent.class);
@@ -89,7 +91,7 @@ public class JenkinsCIController {
        *  if ( authors.contains(username) && tagName.startsWith(jenkinsProperties.getReleaseTagPrefix())) {
             executorService.submit(new TaskOfOutgoingPost("", outgoingUrl, jenkinsProperties.getUsername(), jenkinsProperties.getPassword()));
         }*/
-        logger.info("[{}] push a new project tag [{}:{}] and trigger jenkins build at time {}",username,project.getName(),tagName,DateTime.now());
+        log.info("[{}] push a new project tag [{}:{}] and trigger jenkins build at time {}",username,project.getName(),tagName,DateTime.now());
         executorService.submit(new TaskOfOutgoingPost("", outgoingUrl, jenkinsProperties.getUsername(), jenkinsProperties.getPassword()));
         
         return null;
@@ -111,7 +113,7 @@ public class JenkinsCIController {
         String imagerepo = group;
         boolean isrelease = false;
         if(authors.contains(username) && tagName.startsWith(jenkinsProperties.getReleaseTagPrefix())){// ROO1
-            logger.info("new release image [{}:{}] is pushed by [{}] at time {}",project.getName(),tagName,username,DateTime.now());
+            log.info("new release image [{}:{}] is pushed by [{}] at time {}",project.getName(),tagName,username,DateTime.now());
             
             imagerepo = imagerepo + ONLINE_IMAGES_REPOSITORY_SUFFIX;
             isrelease = true;

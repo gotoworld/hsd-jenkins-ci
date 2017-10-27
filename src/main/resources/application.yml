@@ -49,6 +49,6 @@ jenkins:
   username: jenkins
   password: jenkins
   release_tag_prefix: V0.
-  common_job_name: gold-common-jobs
+  common_job_name: gold-jobs-template
   authors: chenfangri,tangyusheng
   

@@ -25,18 +25,17 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.Args;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Class Description
  * @version Oct 9, 20175:15:34 PM
  * @author Ford.CHEN
  */
+@Slf4j
 public class HttpClientUtils {
     
-    
-    private final static Logger logger = LoggerFactory.getLogger(HttpClientUtils.class);
     
     /** 
      * 
@@ -77,28 +76,28 @@ public class HttpClientUtils {
         StringEntity se = new StringEntity(textMsg, "utf-8");
         try {  
             httppost.setEntity(se);  
-            logger.info("executing post request --> {}", httppost.getURI());  
+            log.info("executing post request --> {}", httppost.getURI());  
             CloseableHttpResponse response = httpclient.execute(httppost,context);  
             try {  
                 HttpEntity entity = response.getEntity();  
                 if (entity != null) {  
-                    logger.info(EntityUtils.toString(entity, "UTF-8"));
+                    log.info(EntityUtils.toString(entity, "UTF-8"));
                 }  
             } finally {  
                 response.close();  
             }  
         } catch (ClientProtocolException e) {  
-            logger.error("post with ClientProtocolException ", e); 
+            log.error("post with ClientProtocolException ", e); 
         } catch (UnsupportedEncodingException e) {  
-            logger.error("post with UnsupportedEncodingException ", e);   
+            log.error("post with UnsupportedEncodingException ", e);   
         } catch (IOException e) {  
-            logger.error("post with IOException ", e);   
+            log.error("post with IOException ", e);   
         } finally {  
             // 关闭连接,释放资源    
             try {  
                 httpclient.close();  
             } catch (IOException e) {  
-                logger.error("post with IOException ", e);  
+                log.error("post with IOException ", e);  
             }  
         }
     }

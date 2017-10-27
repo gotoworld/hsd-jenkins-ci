@@ -8,6 +8,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
 
+import lombok.Data;
+
 
 /**
  * 
@@ -18,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @Configuration
 @ConfigurationProperties(prefix = JenkinsProperties.PREFIX)
+@Data
 public class JenkinsProperties {
 
     public static final String PREFIX = "jenkins";
@@ -53,97 +56,5 @@ public class JenkinsProperties {
     
     
     //GETTER SETTER
-
-    /**
-     * @return the jenkinsUrl
-     */
-    public String getJenkinsUrl() {
-        return jenkinsUrl;
-    }
-
-    /**
-     * @param jenkinsUrl the jenkinsURL to set
-     */
-    public void setJenkinsUrl(String jenkinsUrl) {
-        this.jenkinsUrl = jenkinsUrl;
-    }
-
-    /**
-     * @return the username
-     */
-    public String getUsername() {
-        return username;
-    }
-
-    /**
-     * @param username the username to set
-     */
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    /**
-     * @return the password
-     */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * @param password the password to set
-     */
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    /**
-     * @return the releaseTagPrefix
-     */
-    public String getReleaseTagPrefix() {
-        return releaseTagPrefix;
-    }
-
-    /**
-     * @param releaseTagPrefix the releaseTagPrefix to set
-     */
-    public void setReleaseTagPrefix(String releaseTagPrefix) {
-        this.releaseTagPrefix = releaseTagPrefix;
-    }
-
-    /**
-     * @return the commonJobName
-     */
-    public String getCommonJobName() {
-        return commonJobName;
-    }
-
-    /**
-     * @param commonJobName the commonJobName to set
-     */
-    public void setCommonJobName(String commonJobName) {
-        this.commonJobName = commonJobName;
-    }
-
-    /**
-     * @return the prefix
-     */
-    public static String getPrefix() {
-        return PREFIX;
-    }
-
-
-    /**
-     * @return the authors
-     */
-    public List<String> getAuthors() {
-        return authors;
-    }
-
-    /**
-     * @param authors the authors to set
-     */
-    public void setAuthors(List<String> authors) {
-        this.authors = authors;
-    }
     
 }
