@@ -44,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/jenkins")
 @Slf4j
-public class JenkinsCIController {
+public class JenkinsCIController extends BaseController {
     
     private final static Logger log = LoggerFactory.getLogger(JenkinsCIController.class);
     
@@ -93,6 +93,107 @@ public class JenkinsCIController {
         }*/
         log.info("[{}] push a new project tag [{}:{}] and trigger jenkins build at time {}",username,project.getName(),tagName,DateTime.now());
         executorService.submit(new TaskOfOutgoingPost("", outgoingUrl, jenkinsProperties.getUsername(), jenkinsProperties.getPassword()));
+        
+        return null;
+    }
+    
+    /**
+     * 
+     * 
+     *payload={  
+     *   "actions":[  
+     *      {  
+     *         "name":"game",
+     *         "type":"button",
+     *         "value":"chess"
+     *      }
+     *   ],
+     *   "callback_id":"wopr_game",
+     *   "team":{  
+     *      "id":"T6PBX811B",
+     *      "domain":"heshidai"
+     *   },
+     *   "channel":{  
+     *      "id":"C7SSYE8G7",
+     *      "name":"teamleader"
+     *   },
+     *   "user":{  
+     *      "id":"U6P5SGGM9",
+     *      "name":"ford.chen"
+     *   },
+     *   "action_ts":"1509433406.911165",
+     *   "message_ts":"1509433399.000134",
+     *   "attachment_id":"1",
+     *   "token":"ZeGsrDaUVqs5nSO83Ly5VJdz",
+     *   "is_app_unfurl":false,
+     *   "type":"interactive_message",
+     *   "original_message":{  
+     *      "text":"Would you like to play a game?",
+     *      "bot_id":"B7SE53C8L",
+     *      "attachments":[  
+     *         {  
+     *            "callback_id":"wopr_game",
+     *            "fallback":"You are unable to choose a game",
+     *            "text":"Choose a game to play",
+     *            "id":1,
+     *            "color":"3AA3E3",
+     *            "actions":[  
+     *               {  
+     *                  "id":"1",
+     *                  "name":"game",
+     *                  "text":"Chess",
+     *                  "type":"button",
+     *                  "value":"chess",
+     *                  "style":""
+     *               },
+     *               {  
+     *                  "id":"2",
+     *                  "name":"game",
+     *                  "text":"Falken's Maze",
+     *                  "type":"button",
+     *                  "value":"maze",
+     *                  "style":""
+     *               },
+     *               {  
+     *                  "id":"3",
+     *                  "name":"game",
+     *                  "text":"Thermonuclear War",
+     *                  "type":"button",
+     *                  "value":"war",
+     *                  "style":"danger",
+     *                  "confirm":{  
+     *                     "text":"Wouldn't you prefer a good game of chess?",
+     *                     "title":"Are you sure?",
+     *                     "ok_text":"Yes",
+     *                     "dismiss_text":"No"
+     *                  }
+     *               }
+     *            ]
+     *         }
+     *      ],
+     *      "type":"message",
+     *      "subtype":"bot_message",
+     *      "ts":"1509433399.000134"
+     *   },
+     *   "response_url":"https:\/\/hooks.slack.com\/actions\/T6PBX811B\/265362110598\/RBuRLqk5NSo3ksjAQc65cJci",
+     *   "trigger_id":"264530593588.227405273045.82abfa2066fcaa76dbbe995849d72e65"
+     *}
+     * 
+     * 
+     * Method Description
+     * @version Oct 31, 20173:12:10 PM
+     * @author Ford.CHEN
+     * @param payload
+     * @return
+     */
+    @PostMapping("/publish")
+    public ResVo<BaseVO> publish(@RequestBody String payload) {
+        System.out.println(payload);
+        
+        System.out.println(request);
+        System.out.println(response);
+        System.out.println(session);
+        
         
         return null;
     }

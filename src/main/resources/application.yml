@@ -7,7 +7,7 @@ spring:
     property-naming-strategy: LOWER_CAMEL_CASE 
 
 server:
-  port: 8040
+  port: 12306
 
 management:
   security:
