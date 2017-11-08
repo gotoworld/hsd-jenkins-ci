@@ -107,6 +107,18 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>${commons-lang3.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.9.9</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.3</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -144,34 +156,106 @@
 		</dependencies>
 	</dependencyManagement>
 
+	<profiles>
+		<!-- 开发环境 -->
+		<profile>
+			<id>dev</id>
+			<properties>
+				<runing.env>dev</runing.env>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+
+		<!-- 开发CI环境 -->
+		<profile>
+			<id>dev-ci</id>
+			<properties>
+				<runing.env>dev-ci</runing.env>
+			</properties>
+		</profile>
+		<!-- 生产环境 -->
+		<profile>
+			<id>prod</id>
+			<properties>
+				<runing.env>prod</runing.env>
+			</properties>
+		</profile>
+	</profiles>
+
 	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.1</version>
-					<configuration>
-						<source>${java.version}</source>
-						<target>${java.version}</target>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-maven-plugin</artifactId>
-				</plugin>
-			</plugins>
-		</pluginManagement>
+		<finalName>hsd-jenkins-ci</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.xml</include>
+					<include>**/*.properties</include>
+					<include>**/*.Filter</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources/config/${runing.env}</directory>
+				<targetPath>${project.build.directory}/bin</targetPath>
+			</resource>
+			<resource>
+				<directory>src/main/resources/config/${runing.env}</directory>
+				<targetPath>${project.build.directory}/classes</targetPath>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<classesDirectory>target/classes/</classesDirectory>
+					<outputDirectory>${project.build.directory}/bin</outputDirectory>
+					<archive>
+						<manifestEntries>
+							<Class-Path>.</Class-Path>
+						</manifestEntries>
+						<manifest>
+							<mainClass>com.hsd.jenkins.JenkinsCIApplication</mainClass>
+							<useUniqueVersions>false</useUniqueVersions>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+						</manifest>
+					</archive>
+					<excludes>
+						<exclude>config/</exclude>
+						<exclude>logback-spring.xml</exclude>
+						<exclude>*.properties</exclude>
+						<exclude>*.yml</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<type>jar</type>
+							<includeTypes>jar</includeTypes>
+							<useUniqueVersions>false</useUniqueVersions>
+							<outputDirectory>${project.build.directory}/bin/lib</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
 
-	<distributionManagement>
-		<repository>
-			<id>nexus3</id>
-			<url>http://192.168.254.204:8081/repository/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>nexus3</id>
-			<url>http://192.168.254.204:8081/repository/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
 </project>
