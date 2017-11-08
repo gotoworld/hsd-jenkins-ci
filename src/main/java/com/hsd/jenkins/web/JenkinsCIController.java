@@ -224,7 +224,7 @@ public class JenkinsCIController extends BaseController {
         parameters.put("TAG", tagName);
         parameters.put("GROUP", group);
         parameters.put("APPLICATION", project.getName());
-        parameters.put("IMAGEREPO", group); //bath on different repository, publish to different harbor group repository.
+        parameters.put("IMAGEREPO", imagerepo); //bath on different repository, publish to different harbor group repository.
         parameters.put("ISRELEASE", isrelease);
         return parameters;
     }
