@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- prudent 设置为true 则不同jvm可以的fileAppender可以往同一文件输出内容 -->
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
+	<include resource="org/springframework/boot/logging/logback/bases.xml" />
 	<contextName>JenkinsCI</contextName>
+	
+    <jmxConfigurator/>
+
+    <property name="log_dir" value="./logs" />
+    <property name="maxHistory" value="30"/>
 
 	<!-- 控制台 -->
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -75,21 +81,10 @@
 
 
 	<!-- Special Log Filter -->
-	<!-- myibatis log configure -->
-	<logger name="com.apache.ibatis" level="INFO" />
-	<logger name="org.mybatis.spring" level="DEBUG" />
-	<logger name="java.sql.Connection" level="DEBUG" />
-	<logger name="java.sql.Statement" level="DEBUG" />
-	<logger name="java.sql.PreparedStatement" level="DEBUG" />
-
-	<!-- 减少部分debug日志 -->
-	<logger name="druid.sql" level="INFO" />
-	<logger name="org.apache.shiro" level="INFO" />
-	<logger name="org.mybatis.spring" level="INFO" />
-	<logger name="org.springframework" level="INFO" />
-	<logger name="com.baomidou.mybatisplus" level="INFO" />
-	<logger name="org.apache.ibatis.io" level="INFO" />
-
+    <logger name="java.sql" level="DEBUG" />
+    <logger name="org.springframework" level="INFO" />
+    <logger name="com.ibatis" level="DEBUG" />
+    
 	<!-- OneKey Swith -->
 	<root level="DEBUG">
 		<appender-ref ref="CONSOLE" />

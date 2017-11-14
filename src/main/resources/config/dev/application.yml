@@ -25,7 +25,7 @@ eureka:
         healthCheckUrlPath: /health
     client:
         serviceUrl:
-            defaultZone: http://192.168.254.240:9080/eureka/
+            defaultZone: http://localhost:9080/eureka/
             
 swagger:
     basepackage: com.hsd.jenkins.web
