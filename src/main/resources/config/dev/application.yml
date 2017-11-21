@@ -25,7 +25,14 @@ eureka:
         healthCheckUrlPath: /health
     client:
         serviceUrl:
-            defaultZone: http://localhost:9080/eureka/
+            defaultZone: http://${security.user.name}:${security.user.password}@localhost:9080/eureka/
+
+security:
+  basic:
+    enabled: true
+  user:
+    name: admin
+    password: admin
             
 swagger:
     basepackage: com.hsd.jenkins.web
@@ -37,7 +44,6 @@ swagger:
 logging:
   level.root: info
   path: logs/
-  file: hsd-jenkins-ci.log 
 
 jenkinsci:
   swagger-open: true #是否开启swagger (true/false)
